@@ -1,0 +1,12 @@
+#Build Folders
+bin/
+build/
+
+#VSCode
+.vscode/
+
+# MSBuild
+*.vcxproj
+*.cmake
+*.sln
+*.filters
