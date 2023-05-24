@@ -65,8 +65,13 @@ void Player::Update() {
     if(actionVals[(int)Actions::Right]) {
         x++;
     }
-
+    if(actionVals[(int)Actions::FastFall]) {
+        y++;
+    }
     x = std::clamp(x, 0, 9);
+    if(y >= 20) {
+        y = 0;
+    }
 }
 
 void Player::Tick() {
