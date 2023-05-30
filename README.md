@@ -33,7 +33,7 @@ SFML 2.5.1 is the only dependency. Make sure you have the correct version for yo
 Things to implement (in order):
 - [ ] Placing of tetraminos.
 - [ ] Breaking lines of blocks.
-- [ ] Fastfall
+- [x] Fastfall
 - [ ] Hard Drop
 - [ ] Levels/Increasing Difficulty
 - [ ] Polish?

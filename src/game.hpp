@@ -13,6 +13,9 @@ class Game {
         void Update();
         void Render();
 
+        sf::RenderTexture tex;
+        sf::Sprite texSprite;
+
         sf::RenderWindow window;
         sf::Event event;
         sf::Font font;
@@ -20,6 +23,10 @@ class Game {
         sf::Time dt;
         
         sf::Text debugText;
+
+        sf::Text pauseText;
+        sf::RectangleShape pauseBg;
+        
         sf::RectangleShape blockShape;
         sf::Vector2f blockPos;
 

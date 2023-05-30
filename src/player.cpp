@@ -1,14 +1,17 @@
+#include <cstdio>
+#include <cstdlib>
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+
+#include "tetramino.hpp"
 #include "player.hpp"
 
-Player::Player() : x(0), y(0) {
+Player::Player() : x(5), y(0) {
     this->ClearInput();
-    color = sf::Color::Cyan;
 }
 
 Player::~Player() {
-
 }
 
 void Player::UpdateInputString() {
@@ -58,25 +61,33 @@ void Player::UpdateInput(sf::Event e) {
     }
 }
 
-void Player::Update() {
+void Player::Update(sf::Time deltime, Field& field) {
     if(actionVals[(int)Actions::Left]) {
         x--;
-    }
-    if(actionVals[(int)Actions::Right]) {
+    } else if(actionVals[(int)Actions::Right]) {
         x++;
     }
     if(actionVals[(int)Actions::FastFall]) {
         y++;
     }
-    x = std::clamp(x, 0, 9);
-    if(y >= 20) {
-        y = 0;
+    if(actionVals[(int)Actions::RotLeft]) {
+        tetramino.rotate(-1);
+    } else if (actionVals[(int)Actions::RotRight]) {
+        tetramino.rotate(1);
     }
+    x = std::clamp(x, 0, 9);
+    this->CheckAndPlaceBlock();
 }
 
-void Player::Tick() {
+void Player::Tick(Field& field) {
     y++;
+    this->CheckAndPlaceBlock();
+}
+
+void Player::CheckAndPlaceBlock() {
     if(y >= 20) {
         y = 0;
+        x = 5;
+        tetramino.initBlockFromType((Tetramino::Type)(rand()%7));
     }
 }

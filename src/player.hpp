@@ -1,5 +1,9 @@
 #pragma once
 
+#include "tetramino.hpp"
+
+class Field;
+
 class Player {
     public:
         Player();
@@ -11,10 +15,10 @@ class Player {
         void UpdateInput(sf::Event e);
         void ClearInput();
 
-        void Update();
-        void Tick();
+        void Update(sf::Time deltime, Field& field);
+        void Tick(Field& field);
 
-        sf::Color color;
+        Tetramino tetramino;
         
         //Some small debug stuff, not really relevant
         sf::String inputString;
@@ -23,6 +27,8 @@ class Player {
     private:
         //left, right, drop, fall, hold, rotleft, rotright
         bool actionVals[7];
+
+        void CheckAndPlaceBlock();
 
         enum class Actions {
             Left = 0,

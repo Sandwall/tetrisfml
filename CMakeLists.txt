@@ -9,17 +9,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 set(SFML_STATIC_LIBRARIES TRUE)
 
 # Either uncomment this and change the path or 
+# set it in the CMake cache or CMake GUI
 # set(SFML_DIR "path/to/SFML/lib/cmake/SFML")
 
 find_package(SFML 2.5 COMPONENTS system window graphics audio network REQUIRED)
 
 add_executable(tetrisfml
     "src/main.cpp" 
-    "src/game.cpp" "src/game.hpp"
-    "src/player.cpp" "src/player.hpp"
-    "src/field.cpp" "src/field.hpp"
-    "src/block.hpp"
-    "src/tetramino.cpp" "src/tetramino.hpp"
+    "src/game.cpp"
+    "src/player.cpp"
+    "src/field.cpp"
+    "src/tetramino.cpp"
 )
 
 target_link_libraries(tetrisfml sfml-system sfml-window sfml-graphics sfml-audio sfml-network)

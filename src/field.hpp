@@ -7,7 +7,6 @@ class Field {
         Field();
         ~Field();
 
-
         void Clear();
         Block getBlockAt(int x, int y);
 
