@@ -1,8 +1,7 @@
 #pragma once
 
 #include "tetramino.hpp"
-
-class Field;
+#include "field.hpp"
 
 class Player {
     public:
@@ -15,8 +14,10 @@ class Player {
         void UpdateInput(sf::Event e);
         void ClearInput();
 
-        void Update(sf::Time deltime, Field& field);
-        void Tick(Field& field);
+        void Update(sf::Time deltime);
+        void Tick();
+
+        void AssignField(std::shared_ptr<Field> f);
 
         Tetramino tetramino;
         
@@ -24,11 +25,20 @@ class Player {
         sf::String inputString;
         void UpdateInputString();
         float inputStringDelay = 1.0f;
+
+        bool clearAnim;
     private:
         //left, right, drop, fall, hold, rotleft, rotright
-        bool actionVals[7];
+        Tetramino::Type nextBlock;
+        std::shared_ptr<Field> field;
 
-        void CheckAndPlaceBlock();
+        void CheckBlock();
+        void PlaceBlock();
+        void CycleBlock();
+
+        bool placeable;
+        bool placeDelay;
+        bool actionVals[7];
 
         enum class Actions {
             Left = 0,
@@ -41,4 +51,7 @@ class Player {
         };
 
         const char* controlString[7] = {"Left", "Right", "HardDrop", "FastFall", "Hold", "RotLeft", "RotRight"};
+
+        int tempx;
+        int tempy;
 };

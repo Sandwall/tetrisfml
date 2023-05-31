@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -7,7 +8,8 @@
 #include "tetramino.hpp"
 #include "player.hpp"
 
-Player::Player() : x(5), y(0) {
+Player::Player() : x(5), y(0), placeDelay(false), placeable(false), clearAnim(false) {
+    nextBlock = static_cast<Tetramino::Type>(rand() % 7);
     this->ClearInput();
 }
 
@@ -31,63 +33,110 @@ void Player::UpdateInput(sf::Event e) {
     if(e.type == sf::Event::KeyPressed) {
         switch(e.key.code) {
             case sf::Keyboard::W: {
-                actionVals[(int)Actions::HardDrop] = true;
+                actionVals[static_cast<int>(Actions::HardDrop)] = true;
             } break;
             case sf::Keyboard::A: {
-                actionVals[(int)Actions::Left] = true;
+                actionVals[static_cast<int>(Actions::Left)] = true;
             } break;
             case sf::Keyboard::S: {
-                actionVals[(int)Actions::FastFall] = true;
+                actionVals[static_cast<int>(Actions::FastFall)] = true;
             } break;
             case sf::Keyboard::D: {
-                actionVals[(int)Actions::Right] = true;
+                actionVals[static_cast<int>(Actions::Right)] = true;
             } break;
             case sf::Keyboard::LShift: {
-                actionVals[(int)Actions::Hold] = true;
+                actionVals[static_cast<int>(Actions::Hold)] = true;
             } break;
             case sf::Keyboard::Left: {
-                actionVals[(int)Actions::RotLeft] = true;
+                actionVals[static_cast<int>(Actions::RotLeft)] = true;
             } break;
             case sf::Keyboard::Right: {
-                actionVals[(int)Actions::RotRight] = true;
+                actionVals[static_cast<int>(Actions::RotRight)] = true;
             } break;
         }
     } else if (e.type == sf::Event::MouseButtonPressed) {
         if(e.mouseButton.button == sf::Mouse::Left) {
-            actionVals[(int)Actions::RotLeft] = true;
+            actionVals[static_cast<int>(Actions::RotLeft)] = true;
         } else if (e.mouseButton.button == sf::Mouse::Right) {
-            actionVals[(int)Actions::RotRight] = true;
+            actionVals[static_cast<int>(Actions::RotRight)] = true;
         }
     }
 }
 
-void Player::Update(sf::Time deltime, Field& field) {
-    if(actionVals[(int)Actions::Left]) {
+void Player::Update(sf::Time deltime) {
+    if(actionVals[static_cast<int>(Actions::Left)]) {
         x--;
-    } else if(actionVals[(int)Actions::Right]) {
+    } else if(actionVals[static_cast<int>(Actions::Right)]) {
         x++;
     }
-    if(actionVals[(int)Actions::FastFall]) {
+    if(actionVals[static_cast<int>(Actions::FastFall)]) {
         y++;
     }
-    if(actionVals[(int)Actions::RotLeft]) {
+    if(actionVals[static_cast<int>(Actions::RotLeft)]) {
         tetramino.rotate(-1);
-    } else if (actionVals[(int)Actions::RotRight]) {
+    } else if (actionVals[static_cast<int>(Actions::RotRight)]) {
         tetramino.rotate(1);
     }
-    x = std::clamp(x, 0, 9);
-    this->CheckAndPlaceBlock();
+    this->CheckBlock();
 }
 
-void Player::Tick(Field& field) {
+void Player::Tick() {
     y++;
-    this->CheckAndPlaceBlock();
+    this->CheckBlock();
 }
 
-void Player::CheckAndPlaceBlock() {
-    if(y >= 20) {
-        y = 0;
-        x = 5;
-        tetramino.initBlockFromType((Tetramino::Type)(rand()%7));
+//This is the function to check for collisions
+//and place blocks once they fall
+void Player::CheckBlock() {
+    for(int i = 0; i < 4; i++) {
+        //My habit of not initializing temp variables
+        //in functions led me to using these two
+        //private member variables 
+        tempx = tetramino.blocksPos[i].x + x;
+        tempy = tetramino.blocksPos[i].y + y;
+        if(tempx > 9) {
+            x--;
+        } else if (tempx < 0) {
+            x++;
+        }
+
+        if(tempy >= FIELD_HEIGHT) {
+            placeable = true;
+        }
+        //If block has been placed
+        if(placeable) {
+            if(!placeDelay) {
+                placeDelay = true;
+            } else {
+                y--;
+                PlaceBlock();
+                placeDelay = false;
+                placeable = false;
+                field->LineClear();
+                clearAnim = true;
+            }
+        }
     }
+}
+
+void Player::AssignField(std::shared_ptr<Field> f) {
+    field = f;
+}
+
+void Player::PlaceBlock() {
+    for(int i = 0; i < 4; i++) {
+        tempx = tetramino.blocksPos[i].x + x;
+        tempy = tetramino.blocksPos[i].y + y;
+        field->setBlockAt(tempx, tempy, true, tetramino.color);
+    }
+
+    CycleBlock();
+    y = 0;
+    x = 5 - (tetramino.sizeData[static_cast<int>(tetramino.type)] / 2);
+    tetramino.initBlock();
+}
+
+void Player::CycleBlock() {
+    tetramino.type = nextBlock;
+    nextBlock = static_cast<Tetramino::Type>(rand() % 7);
 }

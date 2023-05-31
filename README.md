@@ -18,7 +18,7 @@ The controls/input is built around the OS-native key repeat. Maybe custom repeat
 
 The game plays in an "Arcade-style" system based on levels, with increasing difficulty. As the levels go on, the time between the player's blocks' falling (time between game ticks) decreases until it hits a cap. From there it's a battle of stamina.
 
-The game is capped to 60fps.
+The game is capped to 60fps through SFML functions.
 
 ## Compilation
 CMake is the build system generator. Make sure you have a minimum of CMake 3.20 in order to compile.
@@ -31,8 +31,8 @@ SFML 2.5.1 is the only dependency. Make sure you have the correct version for yo
 
 ## Timeline
 Things to implement (in order):
-- [ ] Placing of tetraminos.
-- [ ] Breaking lines of blocks.
+- [x] Placing of tetraminos (sort of...)
+- [x] Breaking lines of blocks
 - [x] Fastfall
 - [ ] Hard Drop
 - [ ] Levels/Increasing Difficulty

@@ -24,8 +24,12 @@ class Tetramino {
         Type type;
 
         void rotate(short rotations);
-        void initBlockFromType(Type t);
+        void initBlock();
         
+        //This is used for calculating rotations on-the-fly
+        //and spawn position
+        const char sizeData[7] { 4, 3, 3, 2, 3, 3, 3 };
+
     private:        
         const char blockData[7][4][2] {
             { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 }, },    //I
@@ -37,8 +41,6 @@ class Tetramino {
             { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 }, }     //Z
         };
 
-        //This is used for calculating rotations on-the-fly
-        const char sizeData[7] { 4, 3, 3, 2, 3, 3, 3 };
 
         const sf::Color colorData[7] {
             sf::Color::Cyan,
@@ -49,4 +51,7 @@ class Tetramino {
             sf::Color::Magenta,
             sf::Color::Red
         };
+
+        void rotate3x3();
+        void rotate4x4();
 };

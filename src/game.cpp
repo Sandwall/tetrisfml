@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 
 #include <iostream>
+#include <memory>
 
 #include "block.hpp"
 #include "player.hpp"
@@ -11,7 +12,7 @@
 Game::Game() : 
     window(sf::VideoMode(640, 640), "TetriSFML", sf::Style::Close),
     pause(false),
-    fall(false)
+    flashState(false)
 {
     //window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(60);
@@ -29,6 +30,11 @@ Game::Game() :
     blockShape.setOutlineThickness(1.0f);
     blockShape.setOutlineColor(sf::Color::White);
 
+    flashShape.setSize(sf::Vector2f(32.0f * FIELD_WIDTH, 32.0f));
+    flashShape.setOutlineThickness(1.0f);
+    flashShape.setOutlineColor(sf::Color::White);
+    flashShape.setFillColor(sf::Color::White);
+
     pauseText.setString("Pause");
     pauseText.setFont(font);
     pauseText.setCharacterSize(32);
@@ -39,6 +45,9 @@ Game::Game() :
     pauseBg.setFillColor(sf::Color(0x00000080));
     pauseBg.setSize(sf::Vector2f(640.0f, 640.0f));
 
+    field = std::make_shared<Field>();
+    player.AssignField(field);
+
     dt = deltaClock.restart();
 }
 
@@ -48,19 +57,37 @@ Game::~Game() {
 
 void Game::Update() {
     if(!pause) {
-        player.UpdateInputString();
-        player.inputStringDelay -= dt.asSeconds();
-        if(player.inputStringDelay <= 0.0f) {
-            player.inputString.clear();
-            player.inputStringDelay = 1.0f;
+        if(!player.clearAnim) {
+            player.UpdateInputString();
+            player.inputStringDelay -= dt.asSeconds();
+            if(player.inputStringDelay <= 0.0f) {
+                player.inputString.clear();
+                player.inputStringDelay = 1.0f;
+            }
+            debugText.setString(player.inputString);
+            fallTimer -= dt.asSeconds();
+
+            if(fallTimer <= 0) {
+                player.Tick();
+                fallTimer = timeBetweenFall;
+            }
+
+            player.Update(dt);
+        } else {
+            clearAnimTimer -= dt.asSeconds();
+            if(clearAnimTimer <= 0) {
+                player.clearAnim = false;
+                flashState = false;
+                clearAnimTimer = timeForClearAnim;
+                field->RemoveClearedRows();
+            }
+
+            flashTimer -= dt.asSeconds();
+            if(flashTimer <= 0) {
+                flashState = !flashState;
+                flashTimer = timeBetweenFlash;
+            }
         }
-        debugText.setString(player.inputString);
-        timeBetweenFall -= dt.asSeconds();
-        if(timeBetweenFall <= 0) {
-            player.Tick(field);
-            timeBetweenFall = 0.25f;
-        }
-        player.Update(dt, field);
     }
 }
 
@@ -75,9 +102,9 @@ void Game::Render() {
             blockShape.setFillColor(player.tetramino.color);
             tex.draw(blockShape);        
         }
-        for(int i = 0; i < 20; i++) {
-            for(int j = 0; j < 10; j++) {
-                bufferBlock = field.getBlockAt(j, i);
+        for(int i = 0; i < FIELD_HEIGHT; i++) {
+            for(int j = 0; j < FIELD_WIDTH; j++) {
+                bufferBlock = field->getBlockAt(j, i);
                 if(bufferBlock.active) {
                     blockPos.x = j * 32;
                     blockPos.y = i * 32;
@@ -87,6 +114,16 @@ void Game::Render() {
                 }
             }
         }
+
+        if(player.clearAnim && flashState) {
+            for(int i = 0; i < FIELD_HEIGHT; i++) {
+                flashShape.setPosition(0.0f, 32.0f * i);
+                if(field->clearedRows[i]) {
+                    tex.draw(flashShape);
+                }
+            }
+        }
+
         tex.draw(debugText);
         tex.display();
         texSprite.setTexture(tex.getTexture());
