@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "player.hpp"
 #include "field.hpp"
@@ -26,6 +27,14 @@ class Game {
         
         sf::Text debugText;
         sf::Text pauseText;
+        sf::Text scoreText;
+
+        char clearLinesBuffer[8];
+        char levelBuffer[4];
+
+        sf::String scoreSfString;
+        std::string scoreString;
+
         sf::RectangleShape pauseBg;
         
         sf::RectangleShape blockShape;
@@ -36,6 +45,9 @@ class Game {
         Player player;
         Block bufferBlock;
         std::shared_ptr<Field> field;
+
+        int clearedLines;
+        int level;
 
         const float timeBetweenFall = 0.25f;
         const float timeForClearAnim = 0.75f;

@@ -36,7 +36,8 @@ void Field::Clear() {
     memset(field, 0, sizeof(Block) * (FIELD_WIDTH * FIELD_HEIGHT));
 }
 
-void Field::LineClear() {
+bool Field::CheckLineClear() {
+    bool lc = false;
     //Check for which rows may have been cleared
     memset(clearedRows, false, sizeof(bool) * FIELD_HEIGHT);
     numClearedRows = 0;
@@ -49,9 +50,11 @@ void Field::LineClear() {
         }
         if(blocksInRow >= FIELD_WIDTH) {
             clearedRows[i] = true;
+            lc = true;
             numClearedRows++;
         }
     }
+    return lc;
 }
 
 /*  Get rid of every row that was cleared,

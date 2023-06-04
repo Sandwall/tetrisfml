@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 #include "block.hpp"
 #include "player.hpp"
@@ -12,7 +13,9 @@
 Game::Game() : 
     window(sf::VideoMode(640, 640), "TetriSFML", sf::Style::Close),
     pause(false),
-    flashState(false)
+    flashState(false),
+    clearedLines(0),
+    level(1)
 {
     //window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(60);
@@ -26,6 +29,17 @@ Game::Game() :
     debugText.setFillColor(sf::Color::White);
     debugText.setPosition(320.0f, 0.0f);
 
+    pauseText.setString("Pause");
+    pauseText.setFont(font);
+    pauseText.setCharacterSize(32);
+    pauseText.setFillColor(sf::Color::White);
+    pauseText.setPosition(320.0f, 320.0f);
+    pauseText.setOrigin(pauseText.getLocalBounds().width / 2.0f, pauseText.getLocalBounds().height / 2.0f);
+
+    scoreText.setFont(font);
+    scoreText.setCharacterSize(24);
+    scoreText.setFillColor(sf::Color::White);
+
     blockShape.setSize(sf::Vector2f(32.0, 32.0));
     blockShape.setOutlineThickness(1.0f);
     blockShape.setOutlineColor(sf::Color::White);
@@ -34,13 +48,6 @@ Game::Game() :
     flashShape.setOutlineThickness(1.0f);
     flashShape.setOutlineColor(sf::Color::White);
     flashShape.setFillColor(sf::Color::White);
-
-    pauseText.setString("Pause");
-    pauseText.setFont(font);
-    pauseText.setCharacterSize(32);
-    pauseText.setFillColor(sf::Color::White);
-    pauseText.setPosition(320.0f, 320.0f);
-    pauseText.setOrigin(pauseText.getLocalBounds().width / 2.0f, pauseText.getLocalBounds().height / 2.0f);
 
     pauseBg.setFillColor(sf::Color(0x00000080));
     pauseBg.setSize(sf::Vector2f(640.0f, 640.0f));
@@ -80,6 +87,7 @@ void Game::Update() {
                 flashState = false;
                 clearAnimTimer = timeForClearAnim;
                 field->RemoveClearedRows();
+                clearedLines++;
             }
 
             flashTimer -= dt.asSeconds();
@@ -102,6 +110,8 @@ void Game::Render() {
             blockShape.setFillColor(player.tetramino.color);
             tex.draw(blockShape);        
         }
+
+        //Draw the field
         for(int i = 0; i < FIELD_HEIGHT; i++) {
             for(int j = 0; j < FIELD_WIDTH; j++) {
                 bufferBlock = field->getBlockAt(j, i);
@@ -115,6 +125,7 @@ void Game::Render() {
             }
         }
 
+        //Draw the line clear flash
         if(player.clearAnim && flashState) {
             for(int i = 0; i < FIELD_HEIGHT; i++) {
                 flashShape.setPosition(0.0f, 32.0f * i);
@@ -123,6 +134,24 @@ void Game::Render() {
                 }
             }
         }
+
+        //Draw the score text (# of line clears and current level)
+        itoa(clearedLines, clearLinesBuffer, 10);
+        scoreString = "Lines Cleared: ";
+        scoreString.append(clearLinesBuffer);
+        scoreSfString = scoreString;
+        scoreText.setString(scoreSfString);
+        scoreText.setPosition(400, 0);
+        tex.draw(scoreText);
+
+        itoa(level, levelBuffer, 10);
+        scoreString = "Level ";
+        scoreString.append(levelBuffer);
+        scoreString = level;
+        scoreSfString = scoreString;
+        scoreText.setString(scoreSfString);
+        scoreText.setPosition(400, 32);
+        tex.draw(scoreText);
 
         tex.draw(debugText);
         tex.display();

@@ -92,17 +92,14 @@ void Player::CheckBlock() {
         //My habit of not initializing temp variables
         //in functions led me to using these two
         //private member variables 
-        tempx = tetramino.blocksPos[i].x + x;
-        tempy = tetramino.blocksPos[i].y + y;
-        if(tempx > 9) {
+        tempX = tetramino.blocksPos[i].x + x;
+        tempY = tetramino.blocksPos[i].y + y;
+        if(tempX > 9) {
             x--;
-        } else if (tempx < 0) {
+        } else if (tempX < 0) {
             x++;
         }
 
-        if(tempy >= FIELD_HEIGHT) {
-            placeable = true;
-        }
         //If block has been placed
         if(placeable) {
             if(!placeDelay) {
@@ -112,8 +109,11 @@ void Player::CheckBlock() {
                 PlaceBlock();
                 placeDelay = false;
                 placeable = false;
-                field->LineClear();
-                clearAnim = true;
+                if(field->CheckLineClear()) clearAnim = true;
+            }
+        } else {
+            if(tempY >= FIELD_HEIGHT) {
+                placeable = true;
             }
         }
     }
@@ -125,9 +125,9 @@ void Player::AssignField(std::shared_ptr<Field> f) {
 
 void Player::PlaceBlock() {
     for(int i = 0; i < 4; i++) {
-        tempx = tetramino.blocksPos[i].x + x;
-        tempy = tetramino.blocksPos[i].y + y;
-        field->setBlockAt(tempx, tempy, true, tetramino.color);
+        tempX = tetramino.blocksPos[i].x + x;
+        tempY = tetramino.blocksPos[i].y + y;
+        field->setBlockAt(tempX, tempY, true, tetramino.color);
     }
 
     CycleBlock();

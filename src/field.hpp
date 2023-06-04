@@ -20,7 +20,7 @@ class Field {
         void Update();
         void Render();
 
-        void LineClear();
+        bool CheckLineClear();
         void RemoveClearedRows();
 
         bool clearedRows[FIELD_HEIGHT];

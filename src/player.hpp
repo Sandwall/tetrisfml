@@ -52,6 +52,6 @@ class Player {
 
         const char* controlString[7] = {"Left", "Right", "HardDrop", "FastFall", "Hold", "RotLeft", "RotRight"};
 
-        int tempx;
-        int tempy;
+        int tempX;
+        int tempY;
 };
