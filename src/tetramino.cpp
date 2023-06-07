@@ -26,6 +26,7 @@ void Tetramino::rotate(short rotations) {
     //This rotation code is really clunky,
     //considering it doesn't just pull
     //the orientations from a data source
+    //I'll do that later
     if(s == 2) {
     } else if(s == 3) {
         if(rotations > 0) {

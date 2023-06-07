@@ -20,21 +20,23 @@ class Player {
         void AssignField(std::shared_ptr<Field> f);
 
         Tetramino tetramino;
+        Tetramino nextBlock;
         
+#ifdef INPUT_DEBUG_TEXT
         //Some small debug stuff, not really relevant
         sf::String inputString;
         void UpdateInputString();
         float inputStringDelay = 1.0f;
-
+#endif
         bool clearAnim;
     private:
         //left, right, drop, fall, hold, rotleft, rotright
-        Tetramino::Type nextBlock;
         std::shared_ptr<Field> field;
 
         void CheckBlock();
         void PlaceBlock();
         void CycleBlock();
+        void PerformHardDrop();
 
         bool placeable;
         bool placeDelay;

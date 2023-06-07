@@ -9,13 +9,14 @@
 #include "player.hpp"
 
 Player::Player() : x(5), y(0), placeDelay(false), placeable(false), clearAnim(false) {
-    nextBlock = static_cast<Tetramino::Type>(rand() % 7);
+    nextBlock.type = static_cast<Tetramino::Type>(rand() % 7);
     this->ClearInput();
 }
 
 Player::~Player() {
 }
 
+#ifdef INPUT_DEBUG_TEXT
 void Player::UpdateInputString() {
     for(int i = 0; i < 7; i++) {
         if(actionVals[i]) {
@@ -24,6 +25,7 @@ void Player::UpdateInputString() {
         }
     }
 }
+#endif
 
 void Player::ClearInput() {
     memset(actionVals, false, sizeof(bool) * 7);
@@ -71,6 +73,10 @@ void Player::Update(sf::Time deltime) {
     }
     if(actionVals[static_cast<int>(Actions::FastFall)]) {
         y++;
+        this->CheckBlock();
+    }
+    if(actionVals[static_cast<int>(Actions::HardDrop)]) {
+        this->PerformHardDrop();
     }
     if(actionVals[static_cast<int>(Actions::RotLeft)]) {
         tetramino.rotate(-1);
@@ -78,6 +84,11 @@ void Player::Update(sf::Time deltime) {
         tetramino.rotate(1);
     }
     this->CheckBlock();
+}
+
+//TODO
+void Player::PerformHardDrop() {
+
 }
 
 void Player::Tick() {
@@ -114,6 +125,8 @@ void Player::CheckBlock() {
         } else {
             if(tempY >= FIELD_HEIGHT) {
                 placeable = true;
+            } else if(field->getBlockAt(tempX,tempY).active) {
+                placeable = true;
             }
         }
     }
@@ -137,6 +150,6 @@ void Player::PlaceBlock() {
 }
 
 void Player::CycleBlock() {
-    tetramino.type = nextBlock;
-    nextBlock = static_cast<Tetramino::Type>(rand() % 7);
+    tetramino.type = nextBlock.type;
+    nextBlock.type = static_cast<Tetramino::Type>(rand() % 7);
 }

@@ -13,10 +13,19 @@ class Game {
 
         int Run();
     private:
+        enum class GameState {
+            Title,
+            Playing,
+            Lose
+        };
+
+        GameState state;
+
         void Update();
         void Render();
 
         sf::RenderTexture tex;
+        sf::Texture blockTex;
         sf::Sprite texSprite;
 
         sf::RenderWindow window;
@@ -24,10 +33,14 @@ class Game {
         sf::Font font;
         sf::Clock deltaClock;
         sf::Time dt;
-        
+
+#ifdef INPUT_DEBUG_TEXT
         sf::Text debugText;
+#endif
         sf::Text pauseText;
+        sf::Text loseText;
         sf::Text scoreText;
+        sf::Text uiText;
 
         char clearLinesBuffer[8];
         char levelBuffer[4];
@@ -40,11 +53,14 @@ class Game {
         sf::RectangleShape blockShape;
         sf::RectangleShape flashShape;
         sf::Vector2f blockPos;
+        sf::RectangleShape fieldShape;
 
         //std::vector<Tetramino> tetraminos;
         Player player;
         Block bufferBlock;
         std::shared_ptr<Field> field;
+        
+        sf::Vector2f fieldOffset;
 
         int clearedLines;
         int level;

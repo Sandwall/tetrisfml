@@ -24,10 +24,10 @@ class Field {
         void RemoveClearedRows();
 
         bool clearedRows[FIELD_HEIGHT];
+        int numClearedRows;
     private:
         Block field[FIELD_WIDTH * FIELD_HEIGHT];
         Block nullBlock;
         int blocksInRow;
-        int numClearedRows;
 
 };
